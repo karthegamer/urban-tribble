@@ -1,0 +1,94 @@
+{
+  "name": "flood-hazard-api",
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ]
+}
+
+---FILE: requirements.txt---
+# No external packages needed! 
+# We're using only Python standard library to keep the function lightweight.
+# If you need faster geo operations, you could add:
+# shapely==2.0.2
+# pyproj==3.6.1
+
+---FILE: .gitignore---
+.vercel
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+---FILE: README.md---
+# Flood Hazard API
+
+A Vercel serverless function that returns flood hazard levels based on IP address.
+
+## Setup
+
+1. **Upload your flood data JSON** to a public storage service:
+   - Vercel Blob Storage (recommended)
+   - AWS S3
+   - Google Cloud Storage
+   - Any CDN with public access
+
+2. **Update the `FLOOD_DATA_URL`** in `api/flood.py` with your JSON URL
+
+3. **Deploy to Vercel**:
+   ```bash
+   vercel deploy
+   ```
+
+## Usage
+
+### Get flood hazard for requester's IP:
+```bash
+curl https://your-app.vercel.app/api/flood
+```
+
+### Get flood hazard for specific IP:
+```bash
+curl https://your-app.vercel.app/api/flood?ip=8.8.8.8
+```
+
+### POST request:
+```bash
+curl -X POST https://your-app.vercel.app/api/flood \
+  -H "Content-Type: application/json" \
+  -d '{"ip": "8.8.8.8"}'
+```
+
+## Response Format
+
+```json
+{
+  "ip": "8.8.8.8",
+  "location": {
+    "latitude": 37.386,
+    "longitude": -122.084,
+    "city": "Mountain View",
+    "region": "California",
+    "country": "United States"
+  },
+  "flood_hazard": "SLIGHT",
+  "in_flood_zone": true
+}
+```
+
+## Local Testing
+
+```bash
+vercel dev
+```
+
+Then visit: http://localhost:3000/api/flood
