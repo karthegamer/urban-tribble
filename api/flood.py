@@ -105,6 +105,7 @@ class handler(BaseHTTPRequestHandler):
             if not location:
                 self.send_response(400)
                 self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps({'error': f'Could not locate IP: {ip}'}).encode())
                 return
@@ -114,6 +115,7 @@ class handler(BaseHTTPRequestHandler):
             if not flood_data:
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps({'error': 'Failed to load flood data'}).encode())
                 return
@@ -136,7 +138,11 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(response, indent=2).encode())
             
         except Exception as e:
+            print(f"ERROR in handler: {e}")
+            import traceback
+            traceback.print_exc()
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(json.dumps({'error': str(e)}).encode())
